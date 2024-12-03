@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos de {{ categoria.nombre }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Limitar el tamaño de la imagen */
+        .img-thumbnail {
+            width: 100px;  /* Tamaño más adecuado */
+            height: 100px;
+            object-fit: cover;  /* Mantener la proporción de la imagen */
+        }
+
+        /* Estilo para la descripción que permite saltos de línea */
+        .descripcion-col {
+            max-width: 250px; /* Limitar el ancho de la columna de la descripción */
+            word-wrap: break-word;  /* Permitir que el texto se divida en varias líneas */
+        }
+
+        /* Estilos generales */
+        body {
+            background-color: #f8f9fa; /* Fondo suave */
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Barra de navegación */
+        .navbar {
+            background-color: #4CAF50; /* Un verde más fuerte */
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #ffcc00 !important; /* Color dorado al pasar el mouse */
+        }
+
+        /* Estilo para la tabla de productos */
+        .table {
+            margin-top: 20px;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        /* Botones personalizados */
+        .btn-primary, .btn-success, .btn-info {
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+
+        /* Estilo de mensajes */
+        .alert {
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Menú superior -->
+<nav class="navbar navbar-expand-lg navbar-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">Inicio</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Categorías
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {% for categoria_item in categorias %}
+                <li><a class="dropdown-item" href="{% url 'lista_productos' categoria_item.id %}">{{ categoria_item.nombre }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Productos en {{ categoria.nombre }}</h1>
+
+    <!-- Buscador -->
+    <form method="GET" action="{% url 'lista_productos' categoria.id %}" class="mb-4 d-flex justify-content-center">
+        <div class="input-group w-50">
+            <input type="text" name="search" class="form-control" placeholder="Buscar producto..." value="{{ request.GET.search }}" id="searchInput">
+            <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
+    </form>
+
+    <!-- Botón para Agregar Producto -->
+    <div class="text-end mb-4">
+        <a href="{% url 'agregar_producto' categoria.id %}" class="btn btn-success">Agregar Producto</a>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover" id="productTable">
+            <thead class="table-primary">
+                <tr>
+                    <th>Fotografía</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr class="productRow">
+                    <td>
+                        <!-- Fotografía -->
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-thumbnail">
+                        {% else %}
+                            <span class="text-muted">Sin imagen</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ producto.nombre }}</td>
+                    <td class="descripcion-col">{{ producto.descripcion }}</td>
+                    <td>${{ producto.precio|floatformat:0 }}</td>  <!-- Eliminar decimales -->
+                    <td>{{ producto.cantidad }}</td>
+                    <td>
+                        <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-info btn-sm">Ver</a>
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#comprarModal{{ producto.id }}">Comprar</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No se encontraron productos.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para comprar productos -->
+{% for producto in productos %}
+<div class="modal fade" id="comprarModal{{ producto.id }}" tabindex="-1" aria-labelledby="comprarModalLabel{{ producto.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="comprarModalLabel{{ producto.id }}">Comprar {{ producto.nombre }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{% url 'compra_producto' producto.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="cantidad" class="form-label">Cantidad</label>
+                <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" max="{{ producto.cantidad }}" value="1">
+            </div>
+            <button type="submit" class="btn btn-success">Añadir al carrito</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById("searchInput").addEventListener("input", function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll(".productRow");
+
+        rows.forEach(row => {
+            let productName = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+            if (productName.indexOf(filter) > -1) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+</script>
+</body>
+</html>

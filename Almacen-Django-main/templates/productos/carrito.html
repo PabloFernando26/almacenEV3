@@ -1,0 +1,11 @@
+<h2>Carrito de Compras</h2>
+<ul>
+{% for producto in productos %}
+    <li>{{ producto.nombre }} - ${{ producto.precio }} x {{ carrito[producto.id] }}</li>
+{% endfor %}
+</ul>
+<h3>Total: ${{ total }}</h3>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Realizar Compra</button>
+</form>

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="login-container">
+    <h2>Iniciar sesión</h2>
+
+    <!-- Mostrar mensajes de error de autenticación -->
+    {% if messages %}
+      <div class="alert" id="alert-message">
+        {% for message in messages %}
+          <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if form.errors %}
+      <div class="form-errors">
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" class="login-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Usuario</label>
+        {{ form.username }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Contraseña</label>
+        {{ form.password }}
+      </div>
+      <button type="submit" class="submit-btn">Iniciar sesión</button>
+    </form>
+
+    <p>¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate</a></p>
+  </div>
+
+  <style>
+    /* Contenedor principal centrado */
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      max-width: 450px;
+      margin: 50px auto;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-family: 'Arial', sans-serif;
+      font-size: 24px;
+      color: #333;
+    }
+
+    /* Estilo del formulario */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      font-size: 16px;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .login-form input,
+    .login-form button {
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      margin: 5px 0;
+    }
+
+    .login-form input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Botón de submit */
+    .submit-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Estilo del enlace de registro */
+    p {
+      text-align: center;
+      font-size: 14px;
+    }
+
+    p a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    p a:hover {
+      text-decoration: underline;
+    }
+
+    /* Estilo de los errores */
+    .form-errors {
+      color: red;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .form-errors li {
+      margin: 5px 0;
+    }
+
+    /* Estilo de la alerta */
+    .alert {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .alert.show {
+      opacity: 1;
+    }
+
+    /* Animación para el contenedor */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+
+  <script>
+    
+    window.onload = function() {
+      const alertMessage = document.getElementById('alert-message');
+      if (alertMessage) {
+        alertMessage.classList.add('show');
+        setTimeout(() => {
+          alertMessage.classList.remove('show');
+        }, 5000); 
+      }
+    };
+  </script>
+
+{% endblock %}

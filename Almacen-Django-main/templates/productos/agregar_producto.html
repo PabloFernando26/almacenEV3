@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if producto %}
+        Modificar Producto
+    {% else %}
+        Agregar Producto
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{% if producto %}Modificar{% else %}Agregar{% endif %} Producto</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if producto %}
+            <input type="hidden" name="id" value="{{ producto.id }}">
+        {% endif %}
+
+        <!-- Nombre del Producto -->
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre del Producto</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" 
+                   value="{% if producto %}{{ producto.nombre }}{% else %}""{% endif %}" required>
+        </div>
+
+        <!-- Descripción del Producto -->
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required>
+                {% if producto %}{{ producto.descripcion }}{% else %}{{ '' }}{% endif %}
+            </textarea>
+        </div>
+
+        <!-- Precio -->
+        <div class="mb-3">
+            <label for="precio" class="form-label">Precio</label>
+            <input type="number" class="form-control" id="precio" name="precio" 
+                   value="{% if producto %}{{ producto.precio }}{% else %}{{ '' }}{% endif %}" required min="0" step="0.01">
+        </div>
+
+        <!-- Cantidad -->
+        <div class="mb-3">
+            <label for="cantidad" class="form-label">Cantidad</label>
+            <input type="number" class="form-control" id="cantidad" name="cantidad" 
+                   value="{% if producto %}{{ producto.cantidad }}{% else %}{{ '' }}{% endif %}" required min="0">
+        </div>
+
+        <!-- Imagen del Producto -->
+        <div class="mb-3">
+            <label for="imagen" class="form-label">Imagen del Producto</label>
+            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
+            {% if producto and producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="Imagen del producto" class="img-fluid mt-3" style="max-height: 200px;">
+            {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <!-- Botones de acción -->
+            {% if producto %}
+                <button type="submit" class="btn btn-warning">Modificar Producto</button>
+                <a href="{% url 'eliminar_producto' producto.id %}" class="btn btn-danger">Eliminar Producto</a>
+            {% else %}
+                <button type="submit" class="btn btn-success">Agregar Producto</button>
+            {% endif %}
+            <a href="{% url 'lista_productos' categoria.id %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
